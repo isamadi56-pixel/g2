@@ -1,16 +1,34 @@
-FROM debian:bookworm-slim
+    # Use an official Ubuntu as a parent image
+    FROM ubuntu:latest
 
-COPY install.sh /app/install.sh
+    # Set environment variables to prevent interactive prompts during package installation
+    ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /app
+    # Update package lists and install necessary packages
+    # curl: for downloading files
+    # ca-certificates: for SSL certificate verification
+    # gnupg: for handling GPG keys
+    # wget: for downloading files
+    RUN apt-get update && \
+        apt-get install -y \
+        curl \
+        ca-certificates \
+        gnupg \
+        wget \
+        --no-install-recommends && \
+        rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash git curl wget unzip tzdata openssl ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    # Install V2Ray core
+    # Download the latest V2Ray core release script
+    RUN curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install.sh | bash -s -- -version v5.0.0
 
-RUN chmod +x /app/install.sh && /app/install.sh
-COPY config.json /etc/config.json
+    # Copy custom configuration if needed (assuming config.json will be mounted or copied later)
+    # COPY config.json /etc/v2ray/config.json
 
-RUN echo 'echo -e "\n✅ VLESS LINK:\nvless://550e8400-e29b-41d4-a716-446655440000@94.130.50.12:443?encryption=none&security=tls&type=xhttp&mode=packet-up&sni=${CODESPACE_NAME}-443.app.github.dev&path=%2F#ghtun"' >> /etc/bash.bashrc
+    # Expose the default V2Ray client port (inbound)
+    EXPOSE 8080
 
-CMD ["/usr/local/bin/xray", "-c", "/etc/config.json"]
+    # Command to run V2Ray
+    # CMD ["/usr/local/bin/v2ray", "run", "-config", "/etc/v2ray/config.json"]
+    # For development, we might want to run a different command or keep the container alive
+    # CMD ["tail", "-f", "/dev/null"]
