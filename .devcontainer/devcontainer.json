@@ -1,29 +1,11 @@
-{
-  "name": "swift-proxy-3fe937",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": false
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-      "version": "latest"
+    {
+      "name": "G2Ray Development Environment",
+      "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+      "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/devcontainers/features/node:1": {}
+      },
+      "forwardPorts": [8080, 8081],
+      "postCreateCommand": "bash .devcontainer/install.sh",
+      "remoteUser": "vscode"
     }
-  },
-  "postAttachCommand": "gh codespace ports visibility 443:public -c $CODESPACE_NAME && bash /usr/local/bin/start.sh",
-  "portsAttributes": {
-    "443": {
-      "label": "swift-proxy-3fe937",
-      "protocol": "http",
-      "onAutoForward": "silent"
-    }
-  },
-  "forwardPorts": [
-    443
-  ],
-  "hostRequirements": {
-    "cpus": 2
-  }
-}
